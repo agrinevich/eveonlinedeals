@@ -166,7 +166,7 @@ int save_orders(MYSQL *mh, int rid, char *file) {
 
   char *instpl = "REPLACE INTO orders (id, is_buy, issued, duration, reg_id, "
                  "loc_id, sys_id, type_id, price, vol_rem, min_vol) VALUES "
-                 "(%s, %d, '%s', %s, %d, %s, %s, %s, '%s', %s, %s)";
+                 "(%s, %d, '%s', %s, %d, %s, %s, %s, %s, %s, %s)";
   char *ins;
   size_t nbytes;
 
