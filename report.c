@@ -19,6 +19,7 @@ char *build_query(int is_buy, unsigned int type_id, int min_amount,
               WHERE \
                 is_buy = %d AND\
                 type_id = %d AND\
+                duration <= 90 AND\
                 price > 500 AND\
                 price * vol_rem > %d\
               ORDER BY \
