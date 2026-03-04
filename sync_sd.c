@@ -476,11 +476,9 @@ int types2db(char *dir, MYSQL *con) {
 
 int sync_static_data(MYSQL *con) {
 
-  char *universe_dir = "./sde/universe/eve";
-  universe2db(universe_dir, con);
-
-  char *fsd_dir = "./sde/fsd";
-  types2db(fsd_dir, con);
+  char *dir = "./sde";
+  // universe2db(dir, con);
+  types2db(dir, con);
 
   return 0;
 }
