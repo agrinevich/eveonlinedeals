@@ -24,11 +24,11 @@ endif
 COMPILER_CALL = $(CC) $(CFLAGS) ${CPPFLAGS}
 COMPILER_CALL2 = $(CC) $(CFLAGS2)
 
-build: cJSON.o ini.o confutil.o mysqlutil.o sync_sd.o sync_o.o report.o evedeals.o
-	$(COMPILER_CALL) evedeals.o confutil.o mysqlutil.o sync_sd.o sync_o.o report.o cJSON.o ini.o $(LDFLAGS) -o $(EXECUTABLE_NAME) -lm -lyaml
+build: cJSON.o ini.o confutil.o mysqlutil.o sync_sd.o sync_o.o report.o main.o
+	$(COMPILER_CALL) main.o confutil.o mysqlutil.o sync_sd.o sync_o.o report.o cJSON.o ini.o $(LDFLAGS) -o $(EXECUTABLE_NAME) -lm -lyaml
 
-evedeals.o:
-	$(COMPILER_CALL) evedeals.c -c
+main.o:
+	$(COMPILER_CALL) main.c -c
 
 confutil.o:
 	$(COMPILER_CALL) confutil.c -c
