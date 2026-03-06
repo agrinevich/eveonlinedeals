@@ -19,12 +19,12 @@ char *build_query(int is_buy, unsigned int type_id, int min_amount,
               WHERE \
                 is_buy = %d AND\
                 type_id = %d AND\
-                duration <= 90 AND\
-                price > 500 AND\
                 price * vol_rem > %d\
               ORDER BY \
                 price %s, vol_rem DESC\
               LIMIT %d";
+  // duration <= 90 AND
+  // price > 500 AND
   size_t nbytes =
       snprintf(NULL, 0, tpl, is_buy, type_id, min_amount, price_ord, o_qty) + 1;
   char *query = malloc(nbytes);
@@ -73,7 +73,6 @@ int get_orders(struct order a_orders[], int o_qty, MYSQL *mh, int is_buy,
   return orders_found;
 }
 
-// something wrong with returning strings ?
 char *get_region_name(MYSQL *mh, int id) {
   char *tpl = "SELECT name FROM region WHERE id = %d";
   size_t nbytes = snprintf(NULL, 0, tpl, id) + 1;
@@ -99,7 +98,6 @@ char *get_region_name(MYSQL *mh, int id) {
   return reg_name;
 }
 
-// something wrong with returning strings ?
 char *get_system_name(MYSQL *mh, int id) {
   char *tpl = "SELECT name FROM solar_system WHERE id = %d";
   size_t nbytes = snprintf(NULL, 0, tpl, id) + 1;
@@ -135,7 +133,7 @@ int check_deals(MYSQL *mh, config conf, struct item *it) {
   int found_sell = get_orders(a_sell_orders, sell_o_limit, mh, is_buy, it->id,
                               conf.rep.min_amount, price_ord);
   if (found_sell == 0) {
-    // printf("\n%s: no sell orders\n", it->name);
+    // printf("\nskip %s: no sell orders\n", it->name);
     return 0;
   }
 
@@ -154,7 +152,7 @@ int check_deals(MYSQL *mh, config conf, struct item *it) {
   int found_buy = get_orders(a_buy_orders, buy_o_limit, mh, is_buy, it->id,
                              conf.rep.min_amount, price_ord);
   if (found_buy == 0) {
-    // printf("\n%s: no buy orders\n", it->name);
+    // printf("\nskip %s: no buy orders\n", it->name);
     return 0;
   }
 
@@ -165,7 +163,10 @@ int check_deals(MYSQL *mh, config conf, struct item *it) {
   // }
 
   // check if it's profitable
-  if (a_sell_orders[0].price >= a_buy_orders[0].price) {
+  // if (a_sell_orders[0].price >= a_buy_orders[0].price) {
+  double margin = 100 * (1 - a_sell_orders[0].price / a_buy_orders[0].price);
+  if (margin < 5) {
+    // printf("\nskip %s: %lf margin is too low\n", it->name, margin);
     // printf("\n%s: no profit\n", it->name);
     return 0;
   }
@@ -221,10 +222,11 @@ int print_report(MYSQL *mh, config conf) {
     finish_with_error(mh);
   }
 
+  int types_qty = mysql_num_rows(types);
+  printf("Items to compare: %d\n", types_qty);
+
   MYSQL_ROW type_row;
   struct item it = {0};
-  // int types_qty = mysql_num_rows(types);
-  // unsigned long a_types[types_qty];
   // int j = 0;
   while ((type_row = mysql_fetch_row(types))) {
     it.id = atol(type_row[0]);
@@ -232,16 +234,14 @@ int print_report(MYSQL *mh, config conf) {
     strcpy(it.name, type_row[2]);
 
     check_deals(mh, conf, &it);
-    // a_types[j] = atoi(type_row[0]);
+
     // j++;
+    // if (j % 10 == 0) {
+    //   printf("%d\n", j);
+    // }
   }
 
   mysql_free_result(types);
-
-  // int num = sizeof(a_types) / sizeof(a_types[0]);
-  // for (int i = 0; i < num; i++) {
-  //   check_deals(mh, a_types[i]);
-  // }
 
   return 0;
 }
