@@ -2,18 +2,6 @@
 #include <mysql/mysql.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-
-int build_dt(char *buffer, size_t size) {
-  time_t now = time(NULL);
-  struct tm *t = localtime(&now);
-
-  // strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", t);
-
-  strftime(buffer, size, "%Y-%m-%d %H:%M:%S", t);
-
-  return 0;
-}
 
 // TODO move "min_price" to config
 char *build_query(int is_buy, unsigned int type_id, int min_amount,
@@ -175,6 +163,7 @@ int check_deals(MYSQL *mh, config conf, struct item *it) {
   // }
 
   // check if it's profitable
+  // if (a_sell_orders[0].price >= a_buy_orders[0].price) {
   double margin = 100 * (1 - a_sell_orders[0].price / a_buy_orders[0].price);
   if (margin < 5) {
     // printf("\nskip %s: %lf margin is too low\n", it->name, margin);
@@ -238,12 +227,18 @@ int print_report(MYSQL *mh, config conf) {
 
   MYSQL_ROW type_row;
   struct item it = {0};
+  // int j = 0;
   while ((type_row = mysql_fetch_row(types))) {
     it.id = atol(type_row[0]);
     it.volume = atof(type_row[1]);
     strcpy(it.name, type_row[2]);
 
     check_deals(mh, conf, &it);
+
+    // j++;
+    // if (j % 10 == 0) {
+    //   printf("%d\n", j);
+    // }
   }
 
   mysql_free_result(types);
