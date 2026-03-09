@@ -40,6 +40,10 @@ static int config_handler(void *conf, const char *section, const char *name,
 // TODO add time logging
 
 int main(int argc, char **argv) {
+  char dt_now[50];
+  build_dt(dt_now, sizeof(dt_now));
+  printf("Start : %s\n\n", dt_now);
+
   // read args
 
   int dflag = 0; // sync data from local files
@@ -90,7 +94,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  print_config(conf);
+  // print_config(conf);
 
   // connect to mysql
 
@@ -124,6 +128,9 @@ int main(int argc, char **argv) {
   free((void *)conf.db.dbname);
   free((void *)conf.rep.sql_types);
   mysql_close(mh);
+
+  build_dt(dt_now, sizeof(dt_now));
+  printf("\nFinish : %s\n", dt_now);
 
   return 0;
 }
