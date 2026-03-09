@@ -1,5 +1,6 @@
 #include "confutil.h"
 #include "mysqlutil.h"
+#include <time.h>
 
 #define MILLION (1000 * 1000)
 
@@ -25,6 +26,7 @@ struct item {
   char name[256];
 };
 
+int build_dt(char *buffer, size_t size);
 char *build_query(int is_buy, unsigned int type_id, int min_order_amount,
                   char *price_ord, int o_qty);
 int get_orders(struct order orders[], int o_qty, MYSQL *mh, int is_buy,
